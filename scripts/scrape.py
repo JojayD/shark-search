@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-
+from degree_programs import course_data
 import json
 from utils import *
 app = Flask(__name__)
@@ -37,8 +37,14 @@ loaded_course = 'course_data.json'
 
 if __name__ == "__main__":
 	# load_data(loaded_course)
-	scraped_data=scrape_class("CECS")
-	create_json_file('course_data.json', "CECS")
+
+	course_data_list = list(course_data.values())
+	for val in course_data_list[22:]:  # Start iteration at the 23rd index
+		scrape_class(val)
+		create_json_file('course_data.json' ,val)
+	# for val in course_data.values():
+	# 	scrape_class(val)
+	# 	create_json_file('course_data.json', val)
 
 
 	# app.run(debug = True)zx

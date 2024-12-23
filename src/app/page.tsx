@@ -1,7 +1,7 @@
 // pages/LandingPage.tsx
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import SearchBar from "@/components/SearchBar";
+import Footer from "@/app/components/Footer";
+import Header from "@/app/components/Header";
+import SearchBar from "@/app/components/SearchBar";
 
 export default function LandingPage() {
     return (
