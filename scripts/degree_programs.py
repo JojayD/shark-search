@@ -1,7 +1,7 @@
 course_data = {
     "Accountancy": "ACCT",
     "Africana Studies": "AFRS",
-    "Am Sign Lang Ling&Deaf Culture": "ASLD",
+    "Am Sign Lang Ling & Deaf Culture": "ASLD",
     "American Indian Studies": "AIS",
     "American Studies": "AMST",
     "Anthropology": "ANTH",

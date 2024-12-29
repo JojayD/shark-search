@@ -25,7 +25,6 @@ def load_data(filename):
 
 
 def save_data(filename, data):
-
 	lock = FileLock(f"{filename}.lock")
 	with lock:
 		with open(filename, 'w') as file:

@@ -2,18 +2,31 @@
 
 
 "use client"
-
+import {departments} from "@/(data)/departments";
 import React, {useMemo, useState} from 'react';
 import {Autocomplete, Box, TextField} from '@mui/material';
 import courseData from "../../../scripts/course_data.json"; // Adjust the path as needed
 import {ClassType} from '../../types/classType';
 import {useRouter} from 'next/navigation';
-
+import {DepartmentType} from "@/types/departmentType";
+import {courseKeys} from "@/(data)/courseKeys";
 type Props = {};
 
 export default function SearchBar({}: Props) {
     const [selectedClass, setSelectedClass] = useState<ClassType | null>(null);
     const router = useRouter();
+
+
+const mapDepartmentData = (courseKeys: string[]): DepartmentType[] => {
+    return courseKeys.map(deptName => {
+        const dept = departments.find(d => d.name === deptName);
+        if (!dept) {
+            console.warn(`Department not found for name: ${deptName}`);
+            return { name: deptName, code: "UNKNOWN" }; // Handle missing departments
+        }
+        return dept;
+    });
+};
 
 
     const mapCourseData = (courseData: Record<string, ClassType[]>): ClassType[] => {
@@ -49,10 +62,8 @@ export default function SearchBar({}: Props) {
                 renderInput={(params) => (
                     <TextField {...params} label="Search Classes" variant="filled"/>
                 )}
-                // filterOptions={(options, state) => options} // Disable default filtering
                 noOptionsText="No classes found"
                 sx={{width: '100%'}}
-                // Customize renderOption to include unique key using the id
                 renderOption={(props, option) => (
                     <li {...props} key={option.id}>
                         <h1>{`${option.COURSECODE} - ${option.COURSETITLE} - ${option.SEC}`}</h1>
