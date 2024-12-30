@@ -17,59 +17,79 @@ export default function SearchBar({}: Props) {
     const router = useRouter();
 
 
-const mapDepartmentData = (courseKeys: string[]): DepartmentType[] => {
+const mapDepartmentData = (departments: DepartmentType[]) => {
+    let idCounter = 1; // Initialize the counter
     return courseKeys.map(deptName => {
         const dept = departments.find(d => d.name === deptName);
+
         if (!dept) {
             console.warn(`Department not found for name: ${deptName}`);
-            return { name: deptName, code: "UNKNOWN" }; // Handle missing departments
+            return { id: idCounter++, name: deptName, code: "UNKNOWN" }; // Assign id and handle missing departments
         }
-        return dept;
+        return { ...dept, id: idCounter++ }; // Assign id for valid departments
     });
 };
 
 
-    const mapCourseData = (courseData: Record<string, ClassType[]>): ClassType[] => {
-        let idCounter = 1; // Initialize a counter for unique ids
-        return Object.values(courseData).flat().map((cls) => ({
-            ...cls,
-            id: idCounter++,  // Assign and increment the unique id
-        }));
-    };
+    // const mapCourseData = (courseData: Record<string, ClassType[]>): ClassType[] => {
+    //     let idCounter = 1; // Initialize a counter for unique ids
+    //     return Object.values(courseData).flat().map((cls) => ({
+    //         ...cls,
+    //         id: idCounter++,  // Assign and increment the unique id
+    //     }));
+    // };
+
+    interface DepartmentTypeWithID extends DepartmentType {
+        id: number;
+    }
 
 
-    const allClasses: ClassType[] = useMemo(() => {
-        return mapCourseData(courseData);
-    }, [courseData]);
+    const allDepartments: DepartmentTypeWithID[] = useMemo(()=>{
+        return mapDepartmentData(departments);
+    }, [departments])
 
-    const handleClassSelect = (event: any, newValue: ClassType | null) => {
+
+    // const allClasses: ClassType[] = useMemo(() => {
+    //     return mapCourseData(courseData);
+    // }, [courseData]);
+
+    // const handleClassSelect = (event: any, newValue: ClassType | null) => {
+    //     // setSelectedClass(newValue);
+    //     if (newValue) {
+    //
+    //         const query = encodeURIComponent(JSON.stringify(newValue)); // Serialize the object
+    //         console.log(query)
+    //         router.push(`/class/${newValue.COURSECODE}/${newValue.SEC}?data=${query}`)
+    //     }
+    // };
+      const handleDepartmentSelect = (event: any, newValue: DepartmentType | null) => {
         // setSelectedClass(newValue);
         if (newValue) {
 
             const query = encodeURIComponent(JSON.stringify(newValue)); // Serialize the object
             console.log(query)
-            router.push(`/class/${newValue.COURSECODE}/${newValue.SEC}?data=${query}`)
+            router.push(`/departments/${newValue.name}/${newValue.code}?data=${query}`)
         }
     };
 
 
     return (
         <Box sx={{width: '100%', maxWidth: 600, margin: '0 auto', mt: 4}}>
-            <Autocomplete
-                options={allClasses}
-                getOptionLabel={(option) => `${option.COURSECODE} - ${option.COURSETITLE}`}
-                onChange={handleClassSelect} // Update onChange handler
-                renderInput={(params) => (
-                    <TextField {...params} label="Search Classes" variant="filled"/>
-                )}
-                noOptionsText="No classes found"
-                sx={{width: '100%'}}
-                renderOption={(props, option) => (
-                    <li {...props} key={option.id}>
-                        <h1>{`${option.COURSECODE} - ${option.COURSETITLE} - ${option.SEC}`}</h1>
+               <Autocomplete
+                    options={allDepartments}
+                    getOptionLabel={(option) => `${option.name} - ${option.code}`}
+                    onChange={handleDepartmentSelect} // Update onChange handler
+                    renderInput={(params) => (
+                        <TextField {...params} label="Search Classes" variant="filled"/>
+                    )}
+                    noOptionsText="No classes found"
+                    sx={{width: '100%'}}
+                    renderOption={({ key, ...otherProps }, option) => (
+                    <li {...otherProps} key = {option.id}>
+                        <h1>{`${option.name} - ${option.code}`}</h1>
                     </li>
-                )}
-            />
+)}
+                />
         </Box>
     );
 }

@@ -1,6 +1,6 @@
 // src/data/departments.ts
 
-import { DepartmentType } from '@/types/departmentType'; // Ensure this path is correct
+import { DepartmentType } from '@/types/departmentType';
 
 export const departments: DepartmentType[] = [
     { name: "Accountancy", code: "ACCT" },
