@@ -48,10 +48,10 @@ loaded_course = 'course_data.json'
 
 if __name__ == "__main__":
 	# If you want to loop uncomment this
-	# course_data_list = list(course_data.values())
-	# for val in course_data_list[52:]:  # Start iteration at the 23rd index
-	# 	scrape_class(val)
-	# 	create_json_file('course_data.json' ,val)
+	course_data_list = list(course_data.values())
+	for val in course_data_list[73:]:  # Start iteration at the 23rd index
+		scrape_class(val)
+		create_json_file('course_data.json' ,val)
 
 
 	# scrape_class("SzW")

@@ -128,3 +128,15 @@ course_data = {
     "Vietnamese": "VIET",
     "Women's Gender Sexuality Stds": "WGSS"
 }
+
+
+keys_list = list(course_data.keys())
+
+# Get the middle index
+middle_index = 70
+
+
+middle_key = keys_list[middle_index]
+middle_value = course_data[middle_key]
+print(middle_value)
+# print(len(course_data))

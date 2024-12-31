@@ -1,0 +1,50 @@
+[
+    {
+        "SEC": "01",
+        "CLASS": "1791",
+        "NOMATERIALCOST": "",
+        "RESERVECAPACITY": "",
+        "CLASSNOTES": "276,11,12,24,180",
+        "TYPE": "ACT",
+        "DAYS": "NA",
+        "TIME": "NA",
+        "LOCATION": "KIN-020A",
+        "INSTRUCTOR": "Staff",
+        "COMMENT": "Department Consent RequiredClass instruction is: Face to Face - On Campus.",
+        "COURSECODE": "SRL 210",
+        "COURSETITLE": "SPORT CLUBS",
+        "Units": "1 Unit"
+    },
+    {
+        "SEC": "03",
+        "CLASS": "6990",
+        "NOMATERIALCOST": "",
+        "RESERVECAPACITY": "",
+        "CLASSNOTES": "310",
+        "TYPE": "ACT",
+        "DAYS": "TuTh",
+        "TIME": "4-5:15PM",
+        "LOCATION": "FLD-115",
+        "INSTRUCTOR": "Williams E",
+        "COMMENT": "Department Consent RequiredClass instruction is: Face to Face - On Campus.",
+        "COURSECODE": "SRL 210F",
+        "COURSETITLE": "RUGBY",
+        "Units": "1 Unit"
+    },
+    {
+        "SEC": "01",
+        "CLASS": "7925",
+        "NOMATERIALCOST": "",
+        "RESERVECAPACITY": "",
+        "CLASSNOTES": "11,12,24,276",
+        "TYPE": "ACT",
+        "DAYS": "NA",
+        "TIME": "NA",
+        "LOCATION": "KIN-020A",
+        "INSTRUCTOR": "Staff",
+        "COMMENT": "Department Consent RequiredClass instruction is: Face to Face - On Campus.",
+        "COURSECODE": "SRL 210L",
+        "COURSETITLE": "LEADERSHIP",
+        "Units": "1 Unit"
+    }
+]

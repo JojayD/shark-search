@@ -1,0 +1,50 @@
+[
+    {
+        "SEC": "01",
+        "CLASS": "9893",
+        "NOMATERIALCOST": "",
+        "RESERVECAPACITY": "",
+        "CLASSNOTES": "1,138,310",
+        "TYPE": "SEM",
+        "DAYS": "TuTh",
+        "TIME": "10-11:50AM",
+        "LOCATION": "LA2-106",
+        "INSTRUCTOR": "Hashem I",
+        "COMMENT": "Class instruction is: Face to Face - On Campus.",
+        "COURSECODE": "ARAB 101B",
+        "COURSETITLE": "FUNDAMENTALS OF ARABIC",
+        "Units": "4 Units"
+    },
+    {
+        "SEC": "01",
+        "CLASS": "7261",
+        "NOMATERIALCOST": "",
+        "RESERVECAPACITY": "",
+        "CLASSNOTES": "1,139,309",
+        "TYPE": "LEC",
+        "DAYS": "TuTh",
+        "TIME": "5-6:50PM",
+        "LOCATION": "ONLINE-ONLY",
+        "INSTRUCTOR": "Hashem I",
+        "COMMENT": "Class instruction is: Online - Mixed Meet Times.",
+        "COURSECODE": "ARAB 250",
+        "COURSETITLE": "ARABIC FOR ARABIC SPEAKERS",
+        "Units": "6 Units"
+    },
+    {
+        "SEC": "01",
+        "CLASS": "",
+        "NOMATERIALCOST": "",
+        "RESERVECAPACITY": "",
+        "CLASSNOTES": "",
+        "TYPE": "",
+        "DAYS": "NA",
+        "TIME": "NA",
+        "LOCATION": "ONLINE-ONLY",
+        "INSTRUCTOR": "Hashem I",
+        "COMMENT": "additional meeting detail",
+        "COURSECODE": "ARAB 250",
+        "COURSETITLE": "ARABIC FOR ARABIC SPEAKERS",
+        "Units": "6 Units"
+    }
+]

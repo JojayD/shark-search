@@ -1,0 +1,34 @@
+[
+    {
+        "SEC": "01",
+        "CLASS": "7358",
+        "NOMATERIALCOST": "",
+        "RESERVECAPACITY": "",
+        "CLASSNOTES": "",
+        "TYPE": "LEC",
+        "DAYS": "MW",
+        "TIME": "9:30-10:45AM",
+        "LOCATION": "LAB-126",
+        "INSTRUCTOR": "Hogan A",
+        "COMMENT": "Class instruction is: Face to Face - On Campus.",
+        "COURSECODE": "GK 101B",
+        "COURSETITLE": "INTRODUCTORY GREEK",
+        "Units": "3 Units"
+    },
+    {
+        "SEC": "01",
+        "CLASS": "2021",
+        "NOMATERIALCOST": "",
+        "RESERVECAPACITY": "",
+        "CLASSNOTES": "3,305",
+        "TYPE": "SUP",
+        "DAYS": "TBA",
+        "TIME": "NA",
+        "LOCATION": "ONLINE-ONLY",
+        "INSTRUCTOR": "Chew K",
+        "COMMENT": "Instructor Consent RequiredClass instruction is: Asynch. Online-No Meet Times.",
+        "COURSECODE": "GK 499",
+        "COURSETITLE": "DIRECTED STUDIES",
+        "Units": "1-4 Units"
+    }
+]

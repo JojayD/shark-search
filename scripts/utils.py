@@ -99,3 +99,17 @@ def scrape_class(course):
 
 		print(all_data)
 		return all_data
+
+
+def separate_json(filename):
+	if not os.path.exists("data"):
+		os.mkdir("data")
+
+	data = load_data(filename)
+
+	for k, v in data.items():
+		with open(f"data/{k}.json", 'w') as file:
+			json.dump(v, file, indent=4)
+
+
+separate_json("course_data.json")

@@ -1,0 +1,50 @@
+[
+    {
+        "SEC": "01",
+        "CLASS": "7438",
+        "NOMATERIALCOST": "",
+        "RESERVECAPACITY": "",
+        "CLASSNOTES": "305",
+        "TYPE": "LEC",
+        "DAYS": "NA",
+        "TIME": "NA",
+        "LOCATION": "ONLINE-ONLY",
+        "INSTRUCTOR": "Librandi D",
+        "COMMENT": "Class instruction is: Asynch. Online-No Meet Times.",
+        "COURSECODE": "LAT 101A",
+        "COURSETITLE": "INTRODUCTORY LATIN",
+        "Units": "3 Units"
+    },
+    {
+        "SEC": "02",
+        "CLASS": "7683",
+        "NOMATERIALCOST": "",
+        "RESERVECAPACITY": "",
+        "CLASSNOTES": "305",
+        "TYPE": "LEC",
+        "DAYS": "NA",
+        "TIME": "NA",
+        "LOCATION": "ONLINE-ONLY",
+        "INSTRUCTOR": "Librandi D",
+        "COMMENT": "Class instruction is: Asynch. Online-No Meet Times.",
+        "COURSECODE": "LAT 101B",
+        "COURSETITLE": "INTRODUCTORY LATIN",
+        "Units": "3 Units"
+    },
+    {
+        "SEC": "01",
+        "CLASS": "2022",
+        "NOMATERIALCOST": "",
+        "RESERVECAPACITY": "",
+        "CLASSNOTES": "3,305",
+        "TYPE": "SUP",
+        "DAYS": "TBA",
+        "TIME": "NA",
+        "LOCATION": "ONLINE-ONLY",
+        "INSTRUCTOR": "Chew K",
+        "COMMENT": "Instructor Consent RequiredClass instruction is: Asynch. Online-No Meet Times.",
+        "COURSECODE": "LAT 499",
+        "COURSETITLE": "DIRECTED STUDIES",
+        "Units": "1-4 Units"
+    }
+]
