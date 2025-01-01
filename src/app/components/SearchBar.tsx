@@ -31,14 +31,6 @@ const mapDepartmentData = (departments: DepartmentType[]) => {
 };
 
 
-    // const mapCourseData = (courseData: Record<string, ClassType[]>): ClassType[] => {
-    //     let idCounter = 1; // Initialize a counter for unique ids
-    //     return Object.values(courseData).flat().map((cls) => ({
-    //         ...cls,
-    //         id: idCounter++,  // Assign and increment the unique id
-    //     }));
-    // };
-
     interface DepartmentTypeWithID extends DepartmentType {
         id: number;
     }
@@ -49,19 +41,6 @@ const mapDepartmentData = (departments: DepartmentType[]) => {
     }, [departments])
 
 
-    // const allClasses: ClassType[] = useMemo(() => {
-    //     return mapCourseData(courseData);
-    // }, [courseData]);
-
-    // const handleClassSelect = (event: any, newValue: ClassType | null) => {
-    //     // setSelectedClass(newValue);
-    //     if (newValue) {
-    //
-    //         const query = encodeURIComponent(JSON.stringify(newValue)); // Serialize the object
-    //         console.log(query)
-    //         router.push(`/class/${newValue.COURSECODE}/${newValue.SEC}?data=${query}`)
-    //     }
-    // };
       const handleDepartmentSelect = (event: any, newValue: DepartmentType | null) => {
         // setSelectedClass(newValue);
         if (newValue) {
@@ -86,8 +65,7 @@ const mapDepartmentData = (departments: DepartmentType[]) => {
                     renderOption={({ key, ...otherProps }, option) => (
                     <li {...otherProps} key = {option.id}>
                         <h1>{`${option.name} - ${option.code}`}</h1>
-                    </li>
-)}
+                    </li>)}
                 />
         </Box>
     );
