@@ -1,4 +1,7 @@
-Shark Search enables CSULB students to access their class schedules and RateMyProfessor ratings all in one place.
+# Shark Search
+______________________________________________
+This platform enables CSULB students to access their class schedules and RateMyProfessor ratings all in one place.
+______________________________________________
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
