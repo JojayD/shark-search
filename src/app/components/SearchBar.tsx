@@ -13,7 +13,7 @@ import {courseKeys} from "@/(data)/courseKeys";
 type Props = {};
 
 export default function SearchBar({}: Props) {
-    const [selectedClass, setSelectedClass] = useState<ClassType | null>(null);
+    const [selectedDepartment, setSelectedDepartment] = useState<DepartmentType | null>(null);
     const router = useRouter();
 
 
@@ -65,10 +65,9 @@ const mapDepartmentData = (departments: DepartmentType[]) => {
       const handleDepartmentSelect = (event: any, newValue: DepartmentType | null) => {
         // setSelectedClass(newValue);
         if (newValue) {
-
             const query = encodeURIComponent(JSON.stringify(newValue)); // Serialize the object
-            console.log(query)
-            router.push(`/departments/${newValue.name}/${newValue.code}?data=${query}`)
+
+            router.push(`/department/${newValue.name}?data=${query}`);
         }
     };
 
