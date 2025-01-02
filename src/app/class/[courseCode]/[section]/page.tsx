@@ -1,6 +1,6 @@
 "use client";
 import React, {useEffect, useState} from "react";
-import courseData from '../../../../../scripts/course_data.json';
+// import courseData from '../../../../../scripts/course_data.json';
 import axios from "axios";
 import {ClassType} from "../../../../types/classType";
 import {ProfessorType} from "@/types/professorType";
@@ -113,8 +113,7 @@ const ClassDetail = ({ params }: PageProps) => {
 
                         <button
                             className="mt-6 px-6 py-3 bg-blue-500 text-white font-medium rounded hover:bg-blue-600"
-                            onClick={handleGoBack}
-                        >
+                            onClick={handleGoBack}>
                             Go Back
                         </button>
                     </div>
