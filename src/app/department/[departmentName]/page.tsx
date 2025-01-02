@@ -80,11 +80,15 @@ export default function DepartmentClasses({ params }: PageProps) {
             <h1 className="text-2xl font-bold">Department of {departmentDetails.name}</h1>
             {classes && (
                 <div className="mt-4">
-                    {classes.map((classItem,index) => (
-                        <div key={index}>{classItem.CLASS}</div>
+                    {classes.map((classItem, index) => (
+                        <div>
+                            <h1>{classItem.CLASS} - {classItem.SEC}</h1>
+
+                        </div>
                     ))}
                 </div>
-            )}
+            )
+            }
         </div>
     );
 }
