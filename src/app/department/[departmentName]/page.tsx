@@ -4,6 +4,8 @@ import { DepartmentType } from "@/types/departmentType";
 import React, { useEffect, useState } from "react";
 import { ClassType } from "@/types/classType";
 import BackButton from "@/app/department/[departmentName]/_components/BackButton";
+import ClassDetail from "@/app/class/[courseCode]/[section]/page";
+import {ProfessorType} from "@/types/professorType";
 // import {searchProfessorsAtSchoolId, searchSchool, getProfessorRatingAtSchoolId} from "../../utils";
 
 // const rmp =
@@ -20,7 +22,8 @@ export default function DepartmentClasses({ params }: PageProps) {
     const [classes, setClasses] = useState<ClassType[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [professorRating ,setProfessorRating] =useState<string | null>();
+    const [professorRatings ,setProfessorRatings] =useState<ProfessorType | null>();
+    // const [schoolId, setSchoolId]
     const searchParams = useSearchParams();
 
     // Handle search params data
@@ -61,30 +64,57 @@ export default function DepartmentClasses({ params }: PageProps) {
             }
         };
 
-        const fetchProfessorRating = async () => {
-            if (!departmentDetails) return;
-
-            const professorName = "Jean Frechet"; // Replace with dynamic data if needed
-            const schoolId = "12345"; // Replace with actual school ID
-
-            try {
-                const response = await fetch(`/api/ratemyprofessor?action=getProfessorRating&professorName=${encodeURIComponent(professorName)}&schoolId=${schoolId}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setProfessorRating(data.rating);
-                } else {
-                    setError("Failed to fetch professor rating.");
-                }
-            } catch (error) {
-                console.error(error);
-                setError("An error occurred while fetching professor rating.");
-            }
-        };
-
-        fetchProfessorRating();
 
         fetchClasses();
     }, [departmentDetails?.code]); // Only depend on the code property
+
+    useEffect(()=>{
+        const fetchProfessorRatings = async () => {
+            if (!departmentDetails || !classes) return;
+
+                try {
+                    const ratingsPromises = classes.map(async (c: ClassType) => {
+                        const professorName = c.INSTRUCTOR;
+                        let schoolId;
+                        const schoolName = "California State Univeristy, Long Beach"; // Adjust if dynamic
+                        try{
+                            // In your fetchProfessorRatings function
+                            const responseSchoolId = await fetch(`/api/ratemyprofessor?action=searchSchool&schoolName=${encodeURIComponent(schoolName)}`);
+                            if(responseSchoolId.status == 200){
+                              console.log("Successful")
+                            }else{
+                                console.log("Unsuccessful")
+                            }
+                            const schoolData = await responseSchoolId.json();
+                            console.log(schoolData)
+                            schoolId = schoolData.schools[0].node.id;
+                            console.log('School ID:', schoolId);
+                        }catch (error){
+                            console.error("Error getting professor")
+                        }
+                        // Fetch the professor rating from your API route
+                        // const response = await fetch(`app/api/ratemyprofessor?action=getProfessorRating&professorName=${encodeURIComponent(professorName)}&schoolId=${schoolId}`);
+                        // if (response.ok) {
+                        //     const data = await response.json();
+                        //     return { classId: c.id, rating: data.rating };
+                        // } else {
+                        //     // Handle non-OK responses
+                        //     console.error(`Failed to fetch rating for ${professorName}`);
+                        //     return { classId: c.id, rating: null };
+                        // }
+                    });
+                    const ratings = await Promise.all(ratingsPromises);
+
+                    // setProfessorRatings(ratings);
+                } catch (error) {
+                    console.error("Error fetching professor ratings:", error);
+                    setError("An error occurred while fetching professor ratings.");
+                }
+            };
+
+        fetchProfessorRatings();
+
+    },[departmentDetails]);
 
     if (error) {
         return (

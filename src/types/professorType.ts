@@ -1,7 +1,14 @@
 export type ProfessorType = {
-        ProfessorName: String
-        Department: String,
-        level_of_difficulty: String,
-        Quality: String ,
-        num_of_ratings: String
-}
+    __typename: 'Teacher',
+    avgDifficulty: number,
+    avgRating: number,
+    department: string,
+    firstName: string,
+    id: string,
+    isSaved: boolean,
+    lastName: string,
+    legacyId: number,
+    numRatings: number,
+    school: object, // You can replace `object` with a more specific type if needed
+    wouldTakeAgainPercent: number
+};
