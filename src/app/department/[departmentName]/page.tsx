@@ -3,7 +3,11 @@ import { notFound, useSearchParams } from 'next/navigation';
 import { DepartmentType } from "@/types/departmentType";
 import React, { useEffect, useState } from "react";
 import { ClassType } from "@/types/classType";
- import BackButton from "@/app/class/[courseCode]/[section]/_components/BackButton";
+import BackButton from "@/app/department/[departmentName]/_components/BackButton";
+// import {searchProfessorsAtSchoolId, searchSchool, getProfessorRatingAtSchoolId} from "../../utils";
+
+// const rmp =
+
 type PageProps = {
     params: {
         name: string;
@@ -16,6 +20,7 @@ export default function DepartmentClasses({ params }: PageProps) {
     const [classes, setClasses] = useState<ClassType[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [professorRating ,setProfessorRating] =useState<string | null>();
     const searchParams = useSearchParams();
 
     // Handle search params data
@@ -47,7 +52,7 @@ export default function DepartmentClasses({ params }: PageProps) {
 
                 const jsonData: ClassType[] = await response.json();
                 setClasses(jsonData);
-                console.log("Successfully loaded json data")
+                console.log("Successfully loaded json data");
             } catch (error) {
                 setError(`Error loading classes: ${error instanceof Error ? error.message : 'Unknown error'}`);
                 console.error("Failed to fetch classes:", error);
@@ -55,6 +60,28 @@ export default function DepartmentClasses({ params }: PageProps) {
                 setIsLoading(false);
             }
         };
+
+        const fetchProfessorRating = async () => {
+            if (!departmentDetails) return;
+
+            const professorName = "Jean Frechet"; // Replace with dynamic data if needed
+            const schoolId = "12345"; // Replace with actual school ID
+
+            try {
+                const response = await fetch(`/api/ratemyprofessor?action=getProfessorRating&professorName=${encodeURIComponent(professorName)}&schoolId=${schoolId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setProfessorRating(data.rating);
+                } else {
+                    setError("Failed to fetch professor rating.");
+                }
+            } catch (error) {
+                console.error(error);
+                setError("An error occurred while fetching professor rating.");
+            }
+        };
+
+        fetchProfessorRating();
 
         fetchClasses();
     }, [departmentDetails?.code]); // Only depend on the code property
@@ -83,9 +110,9 @@ export default function DepartmentClasses({ params }: PageProps) {
             </div>
 
             {classes && (
-                <div className="mt-4">
+                <div className="mt-4 grid grid-cols-2">
                     {classes.map((classItem, index) => (
-                        <div key={index} className="p-4 border-2 border-gray-300 rounded-md">
+                        <div key={index} className="p-4 border-2 border-gray-300 rounded-md m-8">
                             <h1 className={`text-2xl`}>{classItem.COURSETITLE} - {classItem.SEC}</h1>
                             <p className="text-lg font-medium mb-2">Section: {classItem.SEC}</p>
                             <p className="text-base mb-2">Instructor: {classItem.INSTRUCTOR}</p>
