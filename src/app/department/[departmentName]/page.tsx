@@ -1,11 +1,44 @@
+/**
+ * {rating: {…}}
+ * rating
+ * :
+ * avgDifficulty
+ * :
+ * 2.1
+ * avgRating
+ * :
+ * 4.2
+ * department
+ * :
+ * "Communication"
+ * formattedName
+ * :
+ * "Jose Rodriguez"
+ * link
+ * :
+ * "https://www.ratemyprofessors.com/professor/239089"
+ * numRatings
+ * :
+ * 213
+ * wouldTakeAgainPercent
+ * :
+ * 83.3333
+ * [[Prototype]]
+ * :
+ * Object
+ * [[Prototype]]
+ * :
+ *
+ * */
+
 "use client"
-import { notFound, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { DepartmentType } from "@/types/departmentType";
 import React, { useEffect, useState } from "react";
 import { ClassType } from "@/types/classType";
 import BackButton from "@/app/department/[departmentName]/_components/BackButton";
-import ClassDetail from "@/app/class/[courseCode]/[section]/page";
-import {ProfessorType} from "@/types/professorType";
+import {ProfessorRating} from "@/types/professorRating";
+import {ThreeDot} from "react-loading-indicators";
 // import {searchProfessorsAtSchoolId, searchSchool, getProfessorRatingAtSchoolId} from "../../utils";
 
 // const rmp =
@@ -17,15 +50,48 @@ type PageProps = {
     };
 };
 
+const normalizeProfessorName = (name: string): string => {
+    // Return empty string if name is undefined or null
+    if (!name) return '';
+
+    // Remove any extra spaces and convert to lowercase
+    const cleanName = name.trim().toLowerCase();
+
+    // Handle "Last, F" format (from classes)
+    if (cleanName.includes(',')) {
+        const [lastName] = cleanName.split(',');
+        return lastName.trim(); // Just return the last name
+    }
+
+    // Handle "First Last" format (from ratings)
+    const nameParts = cleanName.split(' ');
+    // Return the last part (last name)
+    return nameParts[nameParts.length - 1];
+};
+
 export default function DepartmentClasses({ params }: PageProps) {
     const [departmentDetails, setDepartmentDetails] = useState<DepartmentType | null>(null);
     const [classes, setClasses] = useState<ClassType[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [professorRatings ,setProfessorRatings] =useState<ProfessorType | null>();
+    const [professorRatings ,setProfessorRatings] =useState<ProfessorRating[] | null>();
+    const [isProfessorRatingLoading, setIsProfessorRatingLoading] = useState<Boolean>(true);
     // const [schoolId, setSchoolId]
     const searchParams = useSearchParams();
+    const getProfessorRating = (instructorName: string) => {
+        if (!professorRatings) return null;
 
+        const normalizedInstructorName = normalizeProfessorName(instructorName);
+
+        return professorRatings.find(rating => {
+            const normalizedRatingName = normalizeProfessorName(rating.formattedName);
+            console.log('Comparing:', {
+                instructor: normalizedInstructorName,
+                rating: normalizedRatingName
+            });
+            return normalizedInstructorName === normalizedRatingName;
+        });
+    };
     // Handle search params data
     useEffect(() => {
         const queryData = searchParams.get("data");
@@ -69,43 +135,61 @@ export default function DepartmentClasses({ params }: PageProps) {
     }, [departmentDetails?.code]); // Only depend on the code property
 
     useEffect(()=>{
+        console.log("Entered fetch professor")
         const fetchProfessorRatings = async () => {
             if (!departmentDetails || !classes) return;
 
                 try {
                     const ratingsPromises = classes.map(async (c: ClassType) => {
                         const professorName = c.INSTRUCTOR;
+                        const professorId = c.id;
                         let schoolId;
                         const schoolName = "California State Univeristy, Long Beach"; // Adjust if dynamic
-                        try{
-                            // In your fetchProfessorRatings function
+                        try {
+
                             const responseSchoolId = await fetch(`/api/ratemyprofessor?action=searchSchool&schoolName=${encodeURIComponent(schoolName)}`);
-                            if(responseSchoolId.status == 200){
-                              console.log("Successful")
+                            if (!responseSchoolId.ok) {
+                                console.error(`Failed to fetch school ID for ${schoolName}`);
+                                throw new Error(`Failed to fetch school ID`);
                             }else{
-                                console.log("Unsuccessful")
+                                console.log("Success")
                             }
                             const schoolData = await responseSchoolId.json();
-                            console.log(schoolData)
-                            schoolId = schoolData.schools[0].node.id;
-                            console.log('School ID:', schoolId);
-                        }catch (error){
-                            console.error("Error getting professor")
-                        }
-                        // Fetch the professor rating from your API route
-                        // const response = await fetch(`app/api/ratemyprofessor?action=getProfessorRating&professorName=${encodeURIComponent(professorName)}&schoolId=${schoolId}`);
-                        // if (response.ok) {
-                        //     const data = await response.json();
-                        //     return { classId: c.id, rating: data.rating };
-                        // } else {
-                        //     // Handle non-OK responses
-                        //     console.error(`Failed to fetch rating for ${professorName}`);
-                        //     return { classId: c.id, rating: null };
-                        // }
-                    });
-                    const ratings = await Promise.all(ratingsPromises);
+                            schoolId = schoolData.schools[0]?.node?.id;
 
-                    // setProfessorRatings(ratings);
+                            if (!schoolId) {
+                                console.error(`School ID not found for ${schoolName}`);
+                                throw new Error("School ID not found");
+                            }
+
+                            const responseProfessor = await fetch(`/api/ratemyprofessor?action=getProfessorRating&professorName=${encodeURIComponent(professorName)}&schoolId=${schoolId}`);
+                            if (responseProfessor.ok) {
+                                const data = await responseProfessor.json();
+                                console.log(data);
+                                return {
+                                    avgDifficulty: data.rating.avgDifficulty,
+                                    avgRating: data.rating.avgRating,
+                                    department: data.rating.department,
+                                    formattedName: data.rating.formattedName,
+                                    link: data.rating.link,
+                                    numRatings: data.rating.numRatings,
+                                    wouldTakeAgainPercent: data.rating.wouldTakeAgainPercent
+                                };
+                            } else {
+                                console.error(`Failed to fetch rating for ${professorName}`);
+                                return null;
+                            }
+                        } catch (error) {
+                            console.error(`Error fetching rating for ${professorName}:`, error);
+                            return null;
+                        }
+                    });
+
+                    const ratings: ProfessorRating[] = (await Promise.all(ratingsPromises))
+                        .filter((rating): rating is ProfessorRating => rating !== null);
+                    setProfessorRatings(ratings)
+                    setIsProfessorRatingLoading(false);
+
                 } catch (error) {
                     console.error("Error fetching professor ratings:", error);
                     setError("An error occurred while fetching professor ratings.");
@@ -115,6 +199,7 @@ export default function DepartmentClasses({ params }: PageProps) {
         fetchProfessorRatings();
 
     },[departmentDetails]);
+
 
     if (error) {
         return (
@@ -134,29 +219,65 @@ export default function DepartmentClasses({ params }: PageProps) {
 
     return (
         <div>
-            <div className={"p-4 flex justify-between items-center"}>
+            <div className="p-4 flex justify-between items-center">
                 <h1 className="text-2xl font-bold">Department of {departmentDetails.name}</h1>
-                <BackButton address={'/'}/>
+                <BackButton address="/"/>
             </div>
-
             {classes && (
-                <div className="mt-4 grid grid-cols-2">
-                    {classes.map((classItem, index) => (
-                        <div key={index} className="p-4 border-2 border-gray-300 rounded-md m-8">
-                            <h1 className={`text-2xl`}>{classItem.COURSETITLE} - {classItem.SEC}</h1>
-                            <p className="text-lg font-medium mb-2">Section: {classItem.SEC}</p>
-                            <p className="text-base mb-2">Instructor: {classItem.INSTRUCTOR}</p>
-                            <p className="text-base mb-2">Days: {classItem.DAYS}</p>
-                            <p className="text-base mb-2">Time: {classItem.TIME}</p>
-                            <p className="text-base mb-2">Location: {classItem.LOCATION}</p>
-                            <p className="text-base mb-2">Units: {classItem.Units}</p>
-                            <p className="text-base mb-2">Notes: {classItem.CLASSNOTES}</p>
-                            <p className="text-base mb-2">Comment: {classItem.COMMENT}</p>
-                        </div>
-                    ))}
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
+                    {classes.map((classItem, index) => {
+                        // Get the rating for this specific professor
+                        const professorRating = classItem?.INSTRUCTOR ?
+                            getProfessorRating(classItem.INSTRUCTOR) : null;
+
+                        return (
+                            <div key={index}
+                                 className="p-4 border-2 border-gray-300 rounded-md m-8">
+                                <h1 className="text-2xl">{classItem?.COURSETITLE || 'No Title'} - {classItem?.SEC || 'No Section'}</h1>
+                                <p className="text-lg font-medium mb-2">Section: {classItem?.SEC || 'N/A'}</p>
+                                <p className="text-base mb-2">Instructor: {classItem?.INSTRUCTOR || 'N/A'}</p>
+                                <p className="text-base mb-2">Days: {classItem?.DAYS || 'N/A'}</p>
+                                <p className="text-base mb-2">Time: {classItem?.TIME || 'N/A'}</p>
+                                <p className="text-base mb-2">Location: {classItem?.LOCATION || 'N/A'}</p>
+                                <p className="text-base mb-2">Units: {classItem?.Units || 'N/A'}</p>
+                                <p className="text-base mb-2">Notes: {classItem?.CLASSNOTES || 'None'}</p>
+                                <p className="text-base mb-2">Comment: {classItem?.COMMENT || 'None'}</p>
+                                {isProfessorRatingLoading ? (
+                                    <ThreeDot
+                                        variant="bounce"
+                                        color="#FBBF24"
+                                        size="medium"
+                                        text="loading professor"
+                                        textColor="#FBBF24"
+                                    />
+                                ) : (
+                                    professorRating ? (
+                                        <div className="mt-4 border-t pt-4">
+                                            <h3 className="text-lg font-semibold">Professor Rating</h3>
+                                            <div className="grid grid-cols-2 gap-2 text-sm p-4">
+                                                <p>Rating: <span className="font-medium">{professorRating.avgRating.toFixed(1)}/5.0</span></p>
+                                                <p>Difficulty: <span className="font-medium">{professorRating.avgDifficulty.toFixed(1)}/5.0</span></p>
+                                                <p>Would Take Again: <span className="font-medium">{professorRating.wouldTakeAgainPercent.toFixed(1)}%</span></p>
+                                                <p>Total Ratings: <span className="font-medium">{professorRating.numRatings}</span></p>
+                                            </div>
+                                            <a
+                                                href={professorRating.link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:text-blue-800 underline"
+                                            >
+                                                See Full Rating
+                                            </a>
+                                        </div>
+                                    ) : (
+                                        <p className="text-gray-500 italic mt-4">No rating available for this professor</p>
+                                    )
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             )}
-            
         </div>
-    );
-}
+
+    );}
