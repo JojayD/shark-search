@@ -1,36 +1,3 @@
-/**
- * {rating: {…}}
- * rating
- * :
- * avgDifficulty
- * :
- * 2.1
- * avgRating
- * :
- * 4.2
- * department
- * :
- * "Communication"
- * formattedName
- * :
- * "Jose Rodriguez"
- * link
- * :
- * "https://www.ratemyprofessors.com/professor/239089"
- * numRatings
- * :
- * 213
- * wouldTakeAgainPercent
- * :
- * 83.3333
- * [[Prototype]]
- * :
- * Object
- * [[Prototype]]
- * :
- *
- * */
-
 "use client"
 import { useSearchParams } from 'next/navigation';
 import { DepartmentType } from "@/types/departmentType";
@@ -49,15 +16,14 @@ type PageProps = {
         data: DepartmentType;
     };
 };
-
-const normalizeProfessorName = (name: string): string => {
+//We are going to use classes and compare it to the which is Classes: Instructor: Hashem I and compare it to professor
+// which is professorRating that is normalzied name:
+const normalizeProfessorNameFromClassesState = (name: string): string => {
     // Return empty string if name is undefined or null
     if (!name) return '';
 
-    // Remove any extra spaces and convert to lowercase
     const cleanName = name.trim().toLowerCase();
 
-    // Handle "Last, F" format (from classes)
     if (cleanName.includes(',')) {
         const [lastName] = cleanName.split(',');
         return lastName.trim(); // Just return the last name
@@ -66,7 +32,28 @@ const normalizeProfessorName = (name: string): string => {
     // Handle "First Last" format (from ratings)
     const nameParts = cleanName.split(' ');
     // Return the last part (last name)
-    return nameParts[nameParts.length - 1];
+    console.log(nameParts[0].toLowerCase());
+    return nameParts[0].toLowerCase();
+};
+
+
+
+const normalizeProfessorNameFromProfessorState = (name: string): string => {
+    // Return empty string if name is undefined or null
+    if (!name) return '';
+
+    const cleanName = name.trim().toLowerCase();
+
+    if (cleanName.includes(',')) {
+        const [lastName] = cleanName.split(',');
+        return lastName.trim(); // Just return the last name
+    }
+
+    // Handle "First Last" format (from ratings)
+    const nameParts = cleanName.split(' ');
+    // Return the last part (last name)
+    console.log(nameParts[1].toLowerCase());
+    return nameParts[1].toLowerCase();
 };
 
 export default function DepartmentClasses({ params }: PageProps) {
@@ -78,19 +65,25 @@ export default function DepartmentClasses({ params }: PageProps) {
     const [isProfessorRatingLoading, setIsProfessorRatingLoading] = useState<Boolean>(true);
     // const [schoolId, setSchoolId]
     const searchParams = useSearchParams();
+
+    //We are going to use classes and compare it to the which is Classes: Instructor: Hashem I and compare it to professor
+    // which is professorRating that is normalzied name:
     const getProfessorRating = (instructorName: string) => {
-        if (!professorRatings) return null;
+      if (!professorRatings) return null;
 
-        const normalizedInstructorName = normalizeProfessorName(instructorName);
+      // 1) Normalize the instructor name (from classes)
+      const normalizedInstructorName = normalizeProfessorNameFromClassesState(instructorName);
 
-        return professorRatings.find(rating => {
-            const normalizedRatingName = normalizeProfessorName(rating.formattedName);
-            console.log('Comparing:', {
-                instructor: normalizedInstructorName,
-                rating: normalizedRatingName
-            });
-            return normalizedInstructorName === normalizedRatingName;
+      // 2) Find the matching professor rating
+      return professorRatings.find((rating) => {
+        const normalizedRatingName = normalizeProfessorNameFromProfessorState(rating.formattedName);
+        console.log('Comparing:', {
+          instructor: normalizedInstructorName,
+          rating: normalizedRatingName,
+          ratingProfessor: rating.formattedName
         });
+        return normalizedInstructorName === normalizedRatingName;
+      });
     };
     // Handle search params data
     useEffect(() => {
@@ -142,7 +135,6 @@ export default function DepartmentClasses({ params }: PageProps) {
                 try {
                     const ratingsPromises = classes.map(async (c: ClassType) => {
                         const professorName = c.INSTRUCTOR;
-                        const professorId = c.id;
                         let schoolId;
                         const schoolName = "California State Univeristy, Long Beach"; // Adjust if dynamic
                         try {
@@ -223,6 +215,17 @@ export default function DepartmentClasses({ params }: PageProps) {
                 <h1 className="text-2xl font-bold">Department of {departmentDetails.name}</h1>
                 <BackButton address="/"/>
             </div>
+            {isProfessorRatingLoading&&
+              <div className={`flex justify-center items-center`}>
+                <ThreeDot
+                    variant="bounce"
+                    color="#FBBF24"
+                    size="medium"
+                    text="loading professor"
+                    textColor="#FBBF24"
+                />
+            </div>
+            }
             {classes && (
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
                     {classes.map((classItem, index) => {
@@ -243,13 +246,7 @@ export default function DepartmentClasses({ params }: PageProps) {
                                 <p className="text-base mb-2">Notes: {classItem?.CLASSNOTES || 'None'}</p>
                                 <p className="text-base mb-2">Comment: {classItem?.COMMENT || 'None'}</p>
                                 {isProfessorRatingLoading ? (
-                                    <ThreeDot
-                                        variant="bounce"
-                                        color="#FBBF24"
-                                        size="medium"
-                                        text="loading professor"
-                                        textColor="#FBBF24"
-                                    />
+                                    <div>Waiting...</div>
                                 ) : (
                                     professorRating ? (
                                         <div className="mt-4 border-t pt-4">
