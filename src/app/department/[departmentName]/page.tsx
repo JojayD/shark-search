@@ -6,16 +6,7 @@ import { ClassType } from "@/types/classType";
 import BackButton from "@/app/department/[departmentName]/_components/BackButton";
 import {ProfessorRating} from "@/types/professorRating";
 import {ThreeDot} from "react-loading-indicators";
-// import {searchProfessorsAtSchoolId, searchSchool, getProfessorRatingAtSchoolId} from "../../utils";
 
-// const rmp =
-
-type PageProps = {
-    params: {
-        name: string;
-        data: DepartmentType;
-    };
-};
 //We are going to use classes and compare it to the which is Classes: Instructor: Hashem I and compare it to professor
 // which is professorRating that is normalzied name:
 const normalizeProfessorNameFromClassesState = (name: string): string => {
@@ -56,7 +47,7 @@ const normalizeProfessorNameFromProfessorState = (name: string): string => {
     return nameParts[1].toLowerCase();
 };
 
-export default function DepartmentClasses({ params }: PageProps) {
+export default function DepartmentClasses() {
     const [departmentDetails, setDepartmentDetails] = useState<DepartmentType | null>(null);
     const [classes, setClasses] = useState<ClassType[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
