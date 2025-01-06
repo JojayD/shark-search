@@ -11,7 +11,6 @@ export default function Footer({ creatorName, csulbLink = "https://www.csulb.edu
   return (
     <footer className="w-full bg-amber-400 text-white py-4">
       <div className="max-w-screen-xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
-        {/* CSULB Link */}
         <div className="mb-2 md:mb-0">
           <a
             href={csulbLink}
@@ -23,7 +22,6 @@ export default function Footer({ creatorName, csulbLink = "https://www.csulb.edu
           </a>
         </div>
 
-        {/* Created By Section */}
         <div>
           <p className="text-sm">
             Created by <span className="font-semibold">{creatorName}</span>
