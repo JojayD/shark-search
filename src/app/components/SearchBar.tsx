@@ -5,8 +5,6 @@
 import {departments} from "@/(data)/departments";
 import React, {useMemo, useState} from 'react';
 import {Autocomplete, Box, TextField} from '@mui/material';
-import courseData from "../../../scripts/course_data.json"; // Adjust the path as needed
-import {ClassType} from '../../types/classType';
 import {useRouter} from 'next/navigation';
 import {DepartmentType} from "@/types/departmentType";
 import {courseKeys} from "@/(data)/courseKeys";
