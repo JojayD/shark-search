@@ -7,10 +7,7 @@ import BackButton from "@/app/department/[departmentName]/_components/BackButton
 import {ProfessorRating} from "@/types/professorRating";
 import {ThreeDot} from "react-loading-indicators";
 
-//We are going to use classes and compare it to the which is Classes: Instructor: Hashem I and compare it to professor
-// which is professorRating that is normalzied name:
 const normalizeProfessorNameFromClassesState = (name: string): string => {
-    // Return empty string if name is undefined or null
     if (!name) return '';
 
     const cleanName = name.trim().toLowerCase();
@@ -20,29 +17,23 @@ const normalizeProfessorNameFromClassesState = (name: string): string => {
         return lastName.trim(); // Just return the last name
     }
 
-    // Handle "First Last" format (from ratings)
     const nameParts = cleanName.split(' ');
-    // Return the last part (last name)
-    console.log(nameParts[0].toLowerCase());
     return nameParts[0].toLowerCase();
 };
 
 
 
 const normalizeProfessorNameFromProfessorState = (name: string): string => {
-    // Return empty string if name is undefined or null
     if (!name) return '';
 
     const cleanName = name.trim().toLowerCase();
 
     if (cleanName.includes(',')) {
         const [lastName] = cleanName.split(',');
-        return lastName.trim(); // Just return the last name
+        return lastName.trim();
     }
 
-    // Handle "First Last" format (from ratings)
     const nameParts = cleanName.split(' ');
-    // Return the last part (last name)
     console.log(nameParts[1].toLowerCase());
     return nameParts[1].toLowerCase();
 };
@@ -54,18 +45,13 @@ export default function DepartmentClasses() {
     const [error, setError] = useState<string | null>(null);
     const [professorRatings ,setProfessorRatings] =useState<ProfessorRating[] | null>();
     const [isProfessorRatingLoading, setIsProfessorRatingLoading] = useState<Boolean>(true);
-    // const [schoolId, setSchoolId]
     const searchParams = useSearchParams();
 
-    //We are going to use classes and compare it to the which is Classes: Instructor: Hashem I and compare it to professor
-    // which is professorRating that is normalzied name:
     const getProfessorRating = (instructorName: string) => {
       if (!professorRatings) return null;
 
-      // 1) Normalize the instructor name (from classes)
       const normalizedInstructorName = normalizeProfessorNameFromClassesState(instructorName);
 
-      // 2) Find the matching professor rating
       return professorRatings.find((rating) => {
         const normalizedRatingName = normalizeProfessorNameFromProfessorState(rating.formattedName);
         console.log('Comparing:', {
@@ -118,70 +104,64 @@ export default function DepartmentClasses() {
         fetchClasses();
     }, [departmentDetails?.code]); // Only depend on the code property
 
-    useEffect(()=>{
-        console.log("Entered fetch professor")
+    useEffect(() => {
         const fetchProfessorRatings = async () => {
             if (!departmentDetails || !classes) return;
 
-                try {
-                    const ratingsPromises = classes.map(async (c: ClassType) => {
-                        const professorName = c.INSTRUCTOR;
-                        let schoolId;
-                        const schoolName = "California State Univeristy, Long Beach"; // Adjust if dynamic
-                        try {
+            try {
+                const schoolName = "California State University, Long Beach";
 
-                            const responseSchoolId = await fetch(`/api/ratemyprofessor?action=searchSchool&schoolName=${encodeURIComponent(schoolName)}`);
-                            if (!responseSchoolId.ok) {
-                                console.error(`Failed to fetch school ID for ${schoolName}`);
-                                throw new Error(`Failed to fetch school ID`);
-                            }else{
-                                console.log("Success")
-                            }
-                            const schoolData = await responseSchoolId.json();
-                            schoolId = schoolData.schools[0]?.node?.id;
+                // Get school ID
+                const responseSchoolId = await fetch(
+                    `/api/ratemyprofessor?action=searchSchool&schoolName=${encodeURIComponent(schoolName)}`
+                );
 
-                            if (!schoolId) {
-                                console.error(`School ID not found for ${schoolName}`);
-                                throw new Error("School ID not found");
-                            }
-
-                            const responseProfessor = await fetch(`/api/ratemyprofessor?action=getProfessorRating&professorName=${encodeURIComponent(professorName)}&schoolId=${schoolId}`);
-                            if (responseProfessor.ok) {
-                                const data = await responseProfessor.json();
-                                console.log(data);
-                                return {
-                                    avgDifficulty: data.rating.avgDifficulty,
-                                    avgRating: data.rating.avgRating,
-                                    department: data.rating.department,
-                                    formattedName: data.rating.formattedName,
-                                    link: data.rating.link,
-                                    numRatings: data.rating.numRatings,
-                                    wouldTakeAgainPercent: data.rating.wouldTakeAgainPercent
-                                };
-                            } else {
-                                console.error(`Failed to fetch rating for ${professorName}`);
-                                return null;
-                            }
-                        } catch (error) {
-                            console.error(`Error fetching rating for ${professorName}:`, error);
-                            return null;
-                        }
-                    });
-
-                    const ratings: ProfessorRating[] = (await Promise.all(ratingsPromises))
-                        .filter((rating): rating is ProfessorRating => rating !== null);
-                    setProfessorRatings(ratings)
-                    setIsProfessorRatingLoading(false);
-
-                } catch (error) {
-                    console.error("Error fetching professor ratings:", error);
-                    setError("An error occurred while fetching professor ratings.");
+                if (!responseSchoolId.ok) {
+                    throw new Error(`Failed to fetch school ID`);
                 }
-            };
 
-        fetchProfessorRatings();
+                const schoolData = await responseSchoolId.json();
+                const schoolId = schoolData.schools[0]?.node?.id;
 
-    },[departmentDetails]);
+                if (!schoolId) {
+                    throw new Error("School ID not found");
+                }
+
+                // Fetch all professor ratings in parallel
+                const ratingsPromises = classes.map(async (c: ClassType) => {
+                    if (!c.INSTRUCTOR) return null;
+
+                    try {
+                        const response = await fetch(
+                            `/api/ratemyprofessor?action=getProfessorRating&professorName=${encodeURIComponent(c.INSTRUCTOR)}&schoolId=${schoolId}`
+                        );
+
+                        if (!response.ok) return null;
+
+                        const data = await response.json();
+                        return data.rating;
+                    } catch (error) {
+                        console.error(`Error fetching rating for ${c.INSTRUCTOR}:`, error);
+                        return null;
+                    }
+                });
+
+                const ratings = (await Promise.all(ratingsPromises))
+                    .filter((rating): rating is ProfessorRating => rating !== null);
+
+                setProfessorRatings(ratings);
+            } catch (error) {
+                console.error("Error fetching professor ratings:", error);
+                setError("An error occurred while fetching professor ratings.");
+            } finally {
+                setIsProfessorRatingLoading(false);
+            }
+        };
+
+        if (departmentDetails && classes) {
+            fetchProfessorRatings();
+        }
+    }, [departmentDetails, classes]);
 
 
     if (error) {
@@ -269,3 +249,156 @@ export default function DepartmentClasses() {
         </div>
 
     );}
+
+// Your existing component code with optimizations
+// export default function DepartmentClasses() {
+//     const [departmentDetails, setDepartmentDetails] = useState<DepartmentType | null>(null);
+//     const [classes, setClasses] = useState<ClassType[] | null>(null);
+//     const [isLoading, setIsLoading] = useState(true);
+//     const [error, setError] = useState<string | null>(null);
+//     const [professorRatings, setProfessorRatings] = useState<ProfessorRating[] | null>();
+//     const [isProfessorRatingLoading, setIsProfessorRatingLoading] = useState<boolean>(true);
+//     const searchParams = useSearchParams();
+//
+//     // Optimize the professor rating fetch function
+//     const fetchProfessorRatings = async () => {
+//         if (!departmentDetails || !classes) return;
+//
+//         try {
+//             const schoolName = "California State University, Long Beach";
+//
+//             // First, get the school ID - this will be cached automatically
+//             const responseSchoolId = await fetch(
+//                 `/api/ratemyprofessor?action=searchSchool&schoolName=${encodeURIComponent(schoolName)}`
+//             );
+//
+//             if (!responseSchoolId.ok) {
+//                 throw new Error(`Failed to fetch school ID`);
+//             }
+//
+//             const schoolData = await responseSchoolId.json();
+//             const schoolId = schoolData.schools[0]?.node?.id;
+//
+//             if (!schoolId) {
+//                 throw new Error("School ID not found");
+//             }
+//
+//             // Fetch all professor ratings in parallel
+//             const ratingsPromises = classes.map(async (c: ClassType) => {
+//                 if (!c.INSTRUCTOR) return null;
+//
+//                 try {
+//                     const response = await fetch(
+//                         `/api/ratemyprofessor?action=getProfessorRating&professorName=${encodeURIComponent(c.INSTRUCTOR)}&schoolId=${schoolId}`
+//                     );
+//
+//                     if (!response.ok) return null;
+//
+//                     const data = await response.json();
+//                     return data.rating;
+//                 } catch (error) {
+//                     console.error(`Error fetching rating for ${c.INSTRUCTOR}:`, error);
+//                     return null;
+//                 }
+//             });
+//
+//             const ratings = (await Promise.all(ratingsPromises))
+//                 .filter((rating): rating is ProfessorRating => rating !== null);
+//
+//             setProfessorRatings(ratings);
+//
+//         } catch (error) {
+//             console.error("Error fetching professor ratings:", error);
+//             setError("An error occurred while fetching professor ratings.");
+//         } finally {
+//             setIsProfessorRatingLoading(false);
+//         }
+//     };
+//
+//     // Your existing useEffect for professor ratings
+//     useEffect(() => {
+//         if (departmentDetails && classes) {
+//             fetchProfessorRatings();
+//         }
+//     }, [departmentDetails, classes]);
+//
+//     // Modify the getProfessorRating function to use normalized comparison
+//     const getProfessorRating = (instructorName: string) => {
+//         if (!professorRatings || !instructorName) return null;
+//
+//         const normalizeForComparison = (name: string): string => {
+//             return name.toLowerCase().replace(/[^a-z]/g, '');
+//         };
+//
+//         return professorRatings.find(rating => {
+//             const normalizedInstructor = normalizeForComparison(instructorName);
+//             const normalizedRating = normalizeForComparison(rating.formattedName);
+//
+//             // Check if the normalized instructor name is included in the rating name
+//             return normalizedRating.includes(normalizedInstructor) ||
+//                    normalizedInstructor.includes(normalizedRating);
+//         });
+//     };
+//
+//     // In your return JSX, where you display professor information:
+//     return (
+//         <div>
+//             {/* ... your existing header JSX ... */}
+//
+//             {classes && (
+//                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
+//                     {classes.map((classItem, index) => {
+//                         const professorRating = classItem?.INSTRUCTOR ?
+//                             getProfessorRating(classItem.INSTRUCTOR) : null;
+//
+//                         return (
+//                             <div key={index} className="p-4 border-2 border-gray-300 rounded-md m-8">
+//                                 {/* ... your existing class details ... */}
+//
+//                                 {isProfessorRatingLoading ? (
+//                                     <ThreeDot
+//                                         variant="bounce"
+//                                         color="#FBBF24"
+//                                         size="medium"
+//                                         text="Loading professor rating"
+//                                         textColor="#FBBF24"
+//                                     />
+//                                 ) : professorRating && professorRating.numRatings > 0 ? (
+//                                     <div className="mt-4 border-t pt-4">
+//                                         <h3 className="text-lg font-semibold">Professor Rating</h3>
+//                                         <div className="grid grid-cols-2 gap-2 text-sm p-4">
+//                                             <p>Rating: <span className="font-medium">
+//                                                 {professorRating.avgRating.toFixed(1)}/5.0
+//                                             </span></p>
+//                                             <p>Difficulty: <span className="font-medium">
+//                                                 {professorRating.avgDifficulty.toFixed(1)}/5.0
+//                                             </span></p>
+//                                             <p>Would Take Again: <span className="font-medium">
+//                                                 {professorRating.wouldTakeAgainPercent.toFixed(1)}%
+//                                             </span></p>
+//                                             <p>Total Ratings: <span className="font-medium">
+//                                                 {professorRating.numRatings}
+//                                             </span></p>
+//                                         </div>
+//                                         <a
+//                                             href={professorRating.link}
+//                                             target="_blank"
+//                                             rel="noopener noreferrer"
+//                                             className="text-blue-600 hover:text-blue-800 underline"
+//                                         >
+//                                             View Full Rating
+//                                         </a>
+//                                     </div>
+//                                 ) : (
+//                                     <p className="text-gray-500 italic mt-4">
+//                                         No ratings available for this professor
+//                                     </p>
+//                                 )}
+//                             </div>
+//                         );
+//                     })}
+//                 </div>
+//             )}
+//         </div>
+//     );
+// }
